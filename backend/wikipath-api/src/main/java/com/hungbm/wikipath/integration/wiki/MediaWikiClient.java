@@ -13,4 +13,9 @@ public class MediaWikiClient implements WikiGateway {
         return List.of();
     }
 
+    @Override
+    public List<String> getOutgoingLinks(String title) {
+        return List.of();
+    }
+
 }
