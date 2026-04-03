@@ -6,6 +6,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import com.hungbm.wikipath.exception.ExternalApiException;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -27,7 +29,7 @@ public class MediaWikiClient implements WikiGateway {
                 .baseUrl(BASE_URL)
                 .defaultHeader(
                         HttpHeaders.USER_AGENT,
-                        "WikiPath/0.1 (student project; contact: hungbm918@gmail.com)")
+                        "WikiPath/0.1 (demo project; contact: [EMAIL_ADDRESS])")
                 .build();
     }
 
@@ -43,20 +45,19 @@ public class MediaWikiClient implements WikiGateway {
                             .path(API_PATH)
                             .queryParam("action", "query")
                             .queryParam("format", "json")
-                            .queryParam("list", "search")
-                            .queryParam("srsearch", query.trim())
-                            .queryParam("srwhat", "title")
-                            .queryParam("srlimit", 5)
+                            .queryParam("list", "prefixsearch")
+                            .queryParam("pssearch", query.trim())
+                            .queryParam("pslimit", 5)
                             .build())
                     .retrieve()
                     .body(String.class);
 
             JsonNode root = jsonMapper.readTree(body);
-            JsonNode searchResults = root.path("query").path("search");
+            JsonNode itemsNode = root.path("query").path("prefixsearch");
 
             List<String> titles = new ArrayList<>();
-            if (searchResults.isArray()) {
-                for (JsonNode item : searchResults) {
+            if (itemsNode.isArray()) {
+                for (JsonNode item : itemsNode) {
                     String title = item.path("title").asString();
                     if (!title.isBlank()) {
                         titles.add(title);
@@ -66,7 +67,7 @@ public class MediaWikiClient implements WikiGateway {
 
             return titles;
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to fetch title suggestions from Wikipedia", e);
+            throw new ExternalApiException("Failed to fetch title suggestions from Wikipedia", e);
         }
     }
 
@@ -132,7 +133,7 @@ public class MediaWikiClient implements WikiGateway {
 
             return new ArrayList<>(links);
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to fetch outgoing links from Wikipedia", e);
+            throw new ExternalApiException("Failed to fetch outgoing links from Wikipedia", e);
         }
     }
 }

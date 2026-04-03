@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.hungbm.wikipath.integration.wiki.WikiGateway;
+import com.hungbm.wikipath.util.TitleNormalizer;
 
 @Service
 public class PageSuggestionService {
@@ -15,7 +16,8 @@ public class PageSuggestionService {
     }
 
     public List<String> suggestTitles(String query) {
-        return wikiGateway.suggestTitles(query);
+        String normalizedQuery = TitleNormalizer.normalizeRequired(query, "q");
+        return wikiGateway.suggestTitles(normalizedQuery);
     }
 
 }
