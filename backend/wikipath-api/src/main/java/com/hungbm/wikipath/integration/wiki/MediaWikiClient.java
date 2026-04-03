@@ -5,6 +5,7 @@ import tools.jackson.databind.json.JsonMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.cache.annotation.Cacheable;
 
 import com.hungbm.wikipath.exception.ExternalApiException;
 
@@ -33,6 +34,7 @@ public class MediaWikiClient implements WikiGateway {
                 .build();
     }
 
+    @Cacheable(cacheNames = "wikiSuggestions", key = "#query.trim().toLowerCase()")
     @Override
     public List<String> suggestTitles(String query) {
         if (query == null || query.isBlank()) {
@@ -71,6 +73,7 @@ public class MediaWikiClient implements WikiGateway {
         }
     }
 
+    @Cacheable(cacheNames = "wikiOutgoingLinks", key = "#title.trim()")
     @Override
     public List<String> getOutgoingLinks(String title) {
         if (title == null || title.isBlank()) {
