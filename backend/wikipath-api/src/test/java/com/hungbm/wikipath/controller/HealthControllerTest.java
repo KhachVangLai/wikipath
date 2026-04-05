@@ -32,7 +32,7 @@ class HealthControllerTest {
     static class CacheTestConfig {
         @Bean
         CacheManager cacheManager() {
-            return new ConcurrentMapCacheManager("wikiSuggestions", "wikiOutgoingLinks");
+            return new ConcurrentMapCacheManager("wikiSuggestions", "wikiOutgoingLinks", "wikiIncomingLinks");
         }
     }
 }

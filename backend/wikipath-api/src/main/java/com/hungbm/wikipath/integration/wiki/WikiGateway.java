@@ -6,4 +6,6 @@ public interface WikiGateway {
     List<String> suggestTitles(String query);
 
     List<String> getOutgoingLinks(String title);
+
+    List<String> getIncomingLinks(String title);
 }

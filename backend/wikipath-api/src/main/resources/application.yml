@@ -2,7 +2,7 @@ spring:
   application:
     name: wikipath-api
   cache:
-    cache-names: wikiSuggestions, wikiOutgoingLinks
+    cache-names: wikiSuggestions, wikiOutgoingLinks, wikiIncomingLinks
     caffeine:
       spec: maximumSize=2000,expireAfterWrite=10m
 
