@@ -19,6 +19,7 @@ interface UseSuggestionsOptions {
 
 export interface SuggestionState {
   containerRef: MutableRefObject<HTMLDivElement | null>;
+  errorMessage: string | null;
   highlightedIndex: number;
   isLoading: boolean;
   isOpen: boolean;
@@ -40,6 +41,7 @@ export function useSuggestions({
   const requestIdRef = useRef(0);
   const committedSelectionRef = useRef<string | null>(null);
   const [items, setItems] = useState<string[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -61,13 +63,13 @@ export function useSuggestions({
   );
 
   const handleInputFocus = useCallback(() => {
-    if (items.length > 0) {
+    if (items.length > 0 || errorMessage) {
       setIsOpen(true);
       setHighlightedIndex((currentValue) =>
-        currentValue >= 0 ? currentValue : 0
+        items.length > 0 ? (currentValue >= 0 ? currentValue : 0) : -1
       );
     }
-  }, [items.length]);
+  }, [errorMessage, items.length]);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLInputElement>) => {
@@ -130,6 +132,7 @@ export function useSuggestions({
 
     if (normalizedQuery.length < minLength) {
       committedSelectionRef.current = null;
+      setErrorMessage(null);
       setItems([]);
       setIsOpen(false);
       setHighlightedIndex(-1);
@@ -138,6 +141,7 @@ export function useSuggestions({
     }
 
     if (normalizedQuery === committedSelectionRef.current) {
+      setErrorMessage(null);
       setItems([]);
       setIsOpen(false);
       setHighlightedIndex(-1);
@@ -151,6 +155,7 @@ export function useSuggestions({
 
     const timer = window.setTimeout(async () => {
       setIsLoading(true);
+      setErrorMessage(null);
 
       try {
         const response = await suggestTitles(normalizedQuery, controller.signal);
@@ -160,6 +165,7 @@ export function useSuggestions({
         }
 
         setItems(response.items);
+        setErrorMessage(null);
         setIsOpen(
           response.items.length > 0 &&
             Boolean(
@@ -181,7 +187,18 @@ export function useSuggestions({
         }
 
         setItems([]);
-        setIsOpen(false);
+        setErrorMessage(
+          "Suggestions are temporarily unavailable. You can still type and search."
+        );
+        setIsOpen(
+          Boolean(
+            containerRef.current?.contains(
+              document.activeElement instanceof Node
+                ? document.activeElement
+                : null
+            )
+          )
+        );
         setHighlightedIndex(-1);
       } finally {
         if (requestIdRef.current === requestId) {
@@ -198,6 +215,7 @@ export function useSuggestions({
 
   return {
     containerRef,
+    errorMessage,
     highlightedIndex,
     isLoading,
     isOpen,

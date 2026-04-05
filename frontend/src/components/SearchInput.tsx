@@ -55,6 +55,7 @@ export function SearchInput({
         />
 
         <SuggestionDropdown
+          errorMessage={suggestionState.errorMessage}
           id={listId}
           items={suggestionState.items}
           isLoading={suggestionState.isLoading}
@@ -67,4 +68,3 @@ export function SearchInput({
     </div>
   );
 }
-

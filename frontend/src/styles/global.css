@@ -338,6 +338,11 @@ code {
   color: var(--text-soft);
 }
 
+.suggestions__status--error {
+  color: var(--warning);
+  background: rgba(185, 91, 0, 0.06);
+}
+
 .suggestions__list {
   margin: 0;
   padding: 8px;

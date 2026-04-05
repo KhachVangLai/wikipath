@@ -1,6 +1,7 @@
 import { AnimatePresence, motion } from "framer-motion";
 
 interface SuggestionDropdownProps {
+  errorMessage: string | null;
   id: string;
   items: string[];
   isLoading: boolean;
@@ -11,6 +12,7 @@ interface SuggestionDropdownProps {
 }
 
 export function SuggestionDropdown({
+  errorMessage,
   id,
   items,
   isLoading,
@@ -20,7 +22,7 @@ export function SuggestionDropdown({
   onSelect
 }: SuggestionDropdownProps) {
   const shouldRender =
-    queryLength >= 2 && (isLoading || (isOpen && items.length > 0));
+    queryLength >= 2 && (isLoading || Boolean(errorMessage) || (isOpen && items.length > 0));
 
   return (
     <AnimatePresence initial={false}>
@@ -35,6 +37,10 @@ export function SuggestionDropdown({
         >
           {isLoading ? (
             <div className="suggestions__status">Searching Wikipedia titles...</div>
+          ) : errorMessage ? (
+            <div className="suggestions__status suggestions__status--error">
+              {errorMessage}
+            </div>
           ) : (
             <ul id={id} role="listbox" className="suggestions__list">
               {items.map((item, index) => (
@@ -65,4 +71,3 @@ export function SuggestionDropdown({
     </AnimatePresence>
   );
 }
-
